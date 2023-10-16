@@ -1,0 +1,11 @@
+pandas
+numpy
+seaborn
+matplotlib
+scikit-learn
+#catboost catboost still to download
+xgboost
+Flask
+
+
+#-e .

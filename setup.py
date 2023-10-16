@@ -11,7 +11,7 @@ def get_requirements(file_path : str) ->List[str] :
 
     with open( file_path ) as file_obj :
         requirement = file_obj.readlines()
-        requirement = [req.replace("/n"," ") for req in requirement]
+        requirement = [req.replace("\n"," ") for req in requirement]
 
     if HYPEN_e_DOT in requirement :
         requirement.remove( HYPEN_e_DOT )
@@ -24,5 +24,5 @@ setup(
     author = "Jerom Kurian",
     author_email = "jeromk60@gmail.com",
     packages = find_packages() ,
-    install_requires = get_requirements("requirement.tx")
+    install_requires = get_requirements("requirements.txt")
 )
