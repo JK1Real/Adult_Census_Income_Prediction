@@ -69,38 +69,70 @@ class DataTransformation :
                train_df = pd.read_csv(train_path)
                test_df = pd.read_csv(test_path)
 
-               logging.info(" Read train and test data completed ")
+               train_df=train_df.replace(' ?',np.nan)
+               test_df=test_df.replace(' ?',np.nan)
+
+             
+               train_df['workclass']=train_df['workclass'].fillna(train_df['workclass'].mode()[0])
+               train_df['occupation']=train_df['occupation'].fillna(train_df['occupation'].mode()[0])
+               train_df['country']=train_df['country'].fillna(train_df['country'].mode()[0])
+
+               test_df['workclass']=test_df['workclass'].fillna(test_df['workclass'].mode()[0])
+               test_df['occupation']=test_df['occupation'].fillna(test_df['occupation'].mode()[0])
+               test_df['country']=test_df['country'].fillna(test_df['country'].mode()[0])
+
+               # Mapping 'salary' values to numeric values
+               train_df['salary'] = train_df['salary'].map({' <=50K': 0, ' >50K': 1})
+               test_df['salary'] = test_df['salary'].map({' <=50K': 0, ' >50K': 1})
+
+               logging.info(train_df.isnull().sum())
+
+               logging.info(f" Read train and test data completed {train_df.shape,test_df.shape} ")
                logging.info(" Obtaining preprocessing object ")
 
+
+               
                preprocessing_obj = self.get_data_transformer_object()
 
                target_column = "salary"
                numerical_columns = ['age', 'fnlwgt', 'education-num', 'capital-gain', 'capital-loss','hours-per-week']
                categorical_columns = ['workclass', 'education', 'marital-status', 'occupation','relationship', 'race', 'sex', 'country']
 
+               logging.info(train_df.head())
+               logging.info(test_df.head())            
+
+
+
+
+               
+
+               logging.info(test_df["salary"].value_counts())
                 # Apply LabelEncoder to categorical columns
                label_encoder = LabelEncoder()
                for col in categorical_columns:
                     train_df[col] = label_encoder.fit_transform(train_df[col])
                     test_df[col] = label_encoder.transform(test_df[col])
 
+               
                input_feature_train_df=train_df.drop(columns=[target_column],axis=1)
                target_feature_train_df=train_df[target_column]
-
+               
+               
                input_feature_test_df=test_df.drop(columns=[target_column],axis=1)
                target_feature_test_df=test_df[target_column]
+
 
                logging.info(
                 f"Applying preprocessing object on training dataframe and testing dataframe." )
                
                input_feature_train_arr=preprocessing_obj.fit_transform(input_feature_train_df)
                input_feature_test_arr=preprocessing_obj.transform(input_feature_test_df)
+               
 
                train_arr = np.c_[ input_feature_train_arr, np.array(target_feature_train_df)]
                test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
                
-               logging.info(f" Saved preprocessing object ")
-
+             
                save_obj(
                     file_path = self.data_tranformation_config.preprocessor_obj_file_path ,
                     obj = preprocessing_obj
